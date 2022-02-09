@@ -8,6 +8,21 @@ DROP TABLE IF EXISTS Theaters;
 
 PRAGMA foreign_keys=ON;
 
+CREATE TABLE Movies (
+    IMDB_key TEXT NOT NULL,
+    title    TEXT NOT NULL,
+    year_     INT NOT NULL,
+    runtime  INT NOT NULL,
+
+    PRIMARY KEY (IMDB_key)
+);
+
+CREATE TABLE Customers (
+    username        TEXT NOT NULL,
+    customer_name   TEXT NOT NULL,
+    password_       TEXT NOT NULL,
+    PRIMARY KEY (username)
+);
 
 CREATE TABLE Theaters (
     theater_name        TEXT NOT NULL,
@@ -24,24 +39,6 @@ CREATE TABLE Screenings (
     PRIMARY KEY (theater_name, movie, start_time),
     FOREIGN KEY (theater_name) REFERENCES Theaters(theatrer_name),
     FOREIGN KEY (movie) REFERENCES Movies (title)
-);
-
-
-CREATE TABLE Movies (
-    IMDB_key TEXT NOT NULL,
-    title    TEXT NOT NULL,
-    year_     INT NOT NULL,
-    runtime  INT NOT NULL,
-
-    PRIMARY KEY (IMDB_key)
-);
-
-
-CREATE TABLE Customers (
-    username        TEXT NOT NULL,
-    customer_name   TEXT NOT NULL,
-    password_       TEXT NOT NULL,
-    PRIMARY KEY (username)
 );
 
 
