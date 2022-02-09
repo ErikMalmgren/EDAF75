@@ -27,18 +27,18 @@ CREATE TABLE Customers (
 CREATE TABLE Theaters (
     theater_name        TEXT NOT NULL,
     capacity            INT NOT NULL,
-    PRIMARY KEY (theater_name, capacity)
+    PRIMARY KEY (theater_name)
 );
 
 
 CREATE TABLE Screenings (
     theater_name TEXT NOT NULL,
     movie        TEXT NOT NULL,
-    date        DATE NOT NULL,
+    date         DATE NOT NULL,
     start_time   TIME NOT NULL,
-    PRIMARY KEY (theater_name, movie, start_time),
-    FOREIGN KEY (theater_name) REFERENCES Theaters(theater_name),
-    FOREIGN KEY (movie) REFERENCES Movies (title)
+    PRIMARY KEY (theater_name, movie, start_time, date),
+    FOREIGN KEY (theater_name) REFERENCES Theaters(theater_name)
+  --FOREIGN KEY (movie) REFERENCES Movies(title)
 );
 
 
@@ -48,13 +48,15 @@ CREATE TABLE Tickets(
     date           DATE NOT NULL,
     time           TIME NOT NULL,
     movie          TEXT NOT NULL,
+    theater_name   TEXT NOT NULL,
     PRIMARY KEY (ticketnumber),
-    FOREIGN KEY (username) REFERENCES Customers(username),
-    FOREIGN KEY (date) REFERENCES Screenings(date),
-    FOREIGN KEY (time) REFERENCES Screenings(time),
-    FOREIGN KEY (movie) REFERENCES Movies(title)
+    FOREIGN KEY (username, date, time, movie, theater_name)
+    REFERENCES  Screenings(username, date, start_time, movie, theater_name)
+    FOREIGN KEY (username)
+    REFERENCES  Customers(username)
 );
 
+BEGIN TRANSACTION;
 
 INSERT
 INTO    Theaters (theater_name, capacity)
@@ -71,7 +73,7 @@ VALUES  ('tt1636826', 'Project X', 2012, 88),
         ('tt0462538', 'The Simpsons', 2007, 87);
 
 INSERT
-INTO    Screenings(theater_name, movie, date, time)
+INTO    Screenings(theater_name, movie, date, start_time)
 VALUES  ('Spegeln', 'Project X', '2022-02-09', '13:37:42'),
         ('Spegeln', 'Project X', '2022-02-09', '23:12:10'),
         ('Filmstaden', 'Project X', '2022-02-09', '13:37:42'),
@@ -84,3 +86,5 @@ VALUES  ('Slayerking1337', 'Adam Bertilsson', 'kaffe123'),
         ('pogman', 'Isak Määttä', 'password'),
         ('JennyDover', 'Erik Malmgren', '123456'),
         ('tjoggepamp', 'Bdam Aertilsson', 'hej');
+
+END TRANSACTION;
