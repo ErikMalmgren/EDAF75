@@ -19,7 +19,7 @@ CREATE TABLE Theaters (
 CREATE TABLE Screenings (
     theater_name TEXT NOT NULL,
     movie        TEXT NOT NULL,
-    date         DATE NOT NULL,
+    date_        DATE NOT NULL,
     start_time   TIME NOT NULL;
     PRIMARY KEY (theater_name, movie, start_time),
     FOREIGN KEY (theater_name) REFERENCES Theaters(theatrer_name),
@@ -30,7 +30,7 @@ CREATE TABLE Screenings (
 CREATE TABLE Movies (
     IMDB_key TEXT NOT NULL,
     title    TEXT NOT NULL,
-    year     INT NOT NULL,
+    year_     INT NOT NULL,
     runtime  INT NOT NULL,
 
     PRIMARY KEY (IMDB_key)
@@ -40,7 +40,7 @@ CREATE TABLE Movies (
 CREATE TABLE Customers (
     username        TEXT NOT NULL,
     customer_name   TEXT NOT NULL,
-    password        TEXT NOT NULL,
+    password_       TEXT NOT NULL,
     PRIMARY KEY (username)
 );
 
@@ -48,13 +48,13 @@ CREATE TABLE Customers (
 CREATE TABLE Tickets(
     ticketnumber   TEXT DEFAULT (lower(hex(randomblob(16)))),
     username       TEXT NOT NULL,
-    date           DATE NOT NULL,
-    time           TIME NOT NULL,
+    date_           DATE NOT NULL,
+    time_           TIME NOT NULL,
     movie          TEXT NOT NULL,
     PRIMARY KEY (ticketnumber),
     FOREIGN KEY (username) REFERENCES Customers(username),
-    FOREIGN KEY (date) REFERENCES Screenings(date),
-    FOREIGN KEY (time) REFERENCES Screenings(time),
+    FOREIGN KEY (date_) REFERENCES Screenings(date_),
+    FOREIGN KEY (time_) REFERENCES Screenings(time_),
     FOREIGN KEY (movie) REFERENCES Movies(title)
 );
 
@@ -75,7 +75,7 @@ VALUE   ('tt1636826', 'Project X', 2012, 88),
 
 INSERT
 INTO    Screenings(theater_name, movie, date, time)
-        ('Spegeln', 'Project X', '2022-02-09', '13:37:42'),
+VALUE   ('Spegeln', 'Project X', '2022-02-09', '13:37:42'),
         ('Spegeln', 'Project X', '2022-02-09', '23:12:10'),
         ('Filmstaden', 'Project X', '2022-02-09', '13:37:42'),
         ('Kårhuset', 'Joker', '2022-02-14', '09:09:09'),
@@ -83,7 +83,7 @@ INTO    Screenings(theater_name, movie, date, time)
 
 INSERT 
 INTO    Customers (username, customer_name, password)
-        ('Slayerking1337', 'Adam Bertilsson', 'kaffe123'),
+VALUE   ('Slayerking1337', 'Adam Bertilsson', 'kaffe123'),
         ('pogman', 'Isak Määttä', 'password'),
         ('JennyDover', 'Erik Malmgren', '123456'),
         ('tjoggepamp', 'Bdam Aertilsson', 'hej');
