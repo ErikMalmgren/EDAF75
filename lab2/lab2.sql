@@ -50,8 +50,8 @@ CREATE TABLE Tickets(
     movie          TEXT NOT NULL,
     theater_name   TEXT NOT NULL,
     PRIMARY KEY (ticketnumber),
-    FOREIGN KEY (username, date, time, movie, theater_name)
-    REFERENCES  Screenings(username, date, start_time, movie, theater_name)
+    FOREIGN KEY (date, time, movie, theater_name)
+    REFERENCES  Screenings(date, start_time, movie, theater_name)
     FOREIGN KEY (username)
     REFERENCES  Customers(username)
 );
