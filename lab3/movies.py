@@ -1,4 +1,5 @@
 from contextlib import nullcontext
+from distutils.log import debug
 from bottle import get, post, run, request, response
 import sqlite3
 from urllib.parse import unquote
@@ -99,4 +100,4 @@ def users():
 
 
 
-run(host='localhost', port=7007)
+run(host='localhost', port=7007, debug=True, reloader=True)
