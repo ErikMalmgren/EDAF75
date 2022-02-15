@@ -12,6 +12,9 @@ import random
 
 db = sqlite3.connect("movies.sqlite")
 
+def response(d):
+    return json.dumps(d, indent=4) + "\n"
+
 @get('/ping')
 def ping():
     response.status = 200
@@ -114,12 +117,13 @@ def users():
     username = request.query.username
     customer_name = request.query.fullName
     password = request.query.pwd
+    if not (username and customer_name and password):
+        response.status = 400
+        return response({"error": "Missing parameter"})
 
-    #
     c.execute(
         """
-        
-        
+ 
         """
     )
 
