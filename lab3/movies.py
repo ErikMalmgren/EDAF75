@@ -110,7 +110,7 @@ def reset():
     response.status = 200
     return "tables reset\n"
 
-# If given user name exists in db, does nothing and returns status code 400
+# If given username exists in db, does nothing and returns status code 400
 # Otherwise adds user nad returns the string /users/<username> and status code 201
 @post('/users')
 def users():
@@ -129,7 +129,6 @@ def users():
         FROM   customers
         """,
     params = []
-    if username:
 
 
 
