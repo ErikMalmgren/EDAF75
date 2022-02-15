@@ -117,15 +117,20 @@ def users():
     username = request.query.username
     customer_name = request.query.fullName
     password = request.query.pwd
+
     if not (username and customer_name and password):
         response.status = 400
         return response({"error": "Missing parameter"})
 
-    c.execute(
-        """
- 
-        """
-    )
+    query = """
+        SELECT username, customer_name, password
+        FROM   customers
+        """,
+    params = []
+    if username:
+
+
+
 
 
 
