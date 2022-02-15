@@ -12,7 +12,7 @@ def ping():
     return {"200 OK" "\n" "Pong" "\n"}
 
 
-@get('/reset')
+@post('/reset')
 def reset():
     return nullcontext
 
