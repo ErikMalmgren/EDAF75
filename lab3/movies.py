@@ -106,6 +106,8 @@ def reset():
     )
     c.execute("END TRANSACTION;")
 
+    c.commit()
+    response.status = 200
     return "tables reset\n"
 
 # If given user name exists in db, does nothing and returns status code 400
@@ -132,6 +134,18 @@ def users():
 
 
 
+
+
+
+
+
+@post
+def movies():
+    c = db.cursor
+    response.content_type = 'movies/json'
+    imdbKey = request.query.imdbKey
+    title = request.query.title
+    year = request.query.year
 
 
 run(host='localhost', port=7007, debug=True)
