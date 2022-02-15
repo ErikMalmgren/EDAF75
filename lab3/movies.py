@@ -91,6 +91,17 @@ def reset():
         );
         """
     )
+    c.execute("BEGIN TRANSACTION;")
+    c.execute(
+        """
+        INSERT
+        INTO    theaters(theater_name, capacity)
+        VALUES  ('Kino',10),
+                ('Regal', 16),
+                ('Skandia, 100);
+        """
+    )
+    c.execute("END TRANSACTION;")
 
     return "tables reset\n"
 
