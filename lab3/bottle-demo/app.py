@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from bottle import get, post, run, request, response
 import sqlite3
 from urllib.parse import unquote
@@ -5,6 +6,15 @@ from urllib.parse import unquote
 
 db = sqlite3.connect("colleges.sqlite")
 
+
+@get('/ping')
+def ping():
+    return {"200 OK" "\n" "Pong" "\n"}
+
+
+@get('/reset')
+def reset():
+    return nullcontext
 
 @get('/studentsSimple')
 def get_students_simple():
@@ -102,4 +112,4 @@ def get_students(s_id):
     return {"data": found}
 
 
-run(host='localhost', port=3000)
+run(host='localhost', port=7007)
