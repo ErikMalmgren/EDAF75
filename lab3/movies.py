@@ -3,6 +3,7 @@ from distutils.log import debug
 from bottle import get, post, run, request, response
 import sqlite3
 from urllib.parse import unquote
+import random
 
 db = sqlite3.connect("movies.sqlite")
 
@@ -14,13 +15,13 @@ def ping():
 @post('/reset')
 def reset():
     c = db.cursor()
-    c.execute("PRAGMA foreign_keys=OFF")
-    c.execute("DROP TABLE IF EXITS theaters")
-    c.execute("DROP TABLE IF EXITS screenings")
-    c.execute("DROP TABLE IF EXITS movies")
-    c.execute("DROP TABLE IF EXITS customers")
-    c.execute("DROP TABLE IF EXITS tickets")
-    c.execute("PRAGMA foreign_keys=ON")
+    c.execute("PRAGMA foreign_keys=OFF;")
+    c.execute("DROP TABLE IF EXITS Theaters;")
+    c.execute("DROP TABLE IF EXITS Screenings;")
+    c.execute("DROP TABLE IF EXITS Movies;")
+    c.execute("DROP TABLE IF EXITS Customers;")
+    c.execute("DROP TABLE IF EXITS Tickets;")
+    c.execute("PRAGMA foreign_keys=ON;")
 
     c.execute(
         """
@@ -47,7 +48,7 @@ def reset():
 
     c.execute(
         """
-        CCREATE TABLE Screenings (
+        CREATE TABLE Screenings (
         theater_name TEXT NOT NULL,
         movie        TEXT NOT NULL,
         date         DATE NOT NULL,
@@ -100,4 +101,4 @@ def users():
 
 
 
-run(host='localhost', port=7007, debug=True, reloader=True)
+run(host='localhost', port=7007, debug=True)
