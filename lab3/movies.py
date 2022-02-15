@@ -1,7 +1,16 @@
+<<<<<<< HEAD
 import sqlite3
 import json
 
 from bottle import get, post, run, response, request
+=======
+from contextlib import nullcontext
+from distutils.log import debug
+from bottle import get, post, run, request, response
+import sqlite3
+from urllib.parse import unquote
+import random
+>>>>>>> 2d7a6a5f51e5aa3fbc6a4dd40fbcaf2e3ead4a20
 
 db = sqlite3.connect("movies.sqlite")
 
@@ -13,13 +22,13 @@ def ping():
 @post('/reset')
 def reset():
     c = db.cursor()
-    c.execute("PRAGMA foreign_keys=OFF")
-    c.execute("DROP TABLE IF EXITS theaters")
-    c.execute("DROP TABLE IF EXITS screenings")
-    c.execute("DROP TABLE IF EXITS movies")
-    c.execute("DROP TABLE IF EXITS customers")
-    c.execute("DROP TABLE IF EXITS tickets")
-    c.execute("PRAGMA foreign_keys=ON")
+    c.execute("PRAGMA foreign_keys=OFF;")
+    c.execute("DROP TABLE IF EXISTS Theaters;")
+    c.execute("DROP TABLE IF EXISTS Screenings;")
+    c.execute("DROP TABLE IF EXISTS Movies;")
+    c.execute("DROP TABLE IF EXISTS Customers;")
+    c.execute("DROP TABLE IF EXISTS Tickets;")
+    c.execute("PRAGMA foreign_keys=ON;")
 
     c.execute(
         """
@@ -85,7 +94,7 @@ def reset():
         """
     )
 
-    return "tables reset"
+    return "tables reset\n"
 
 @post('/users')
 def users():
@@ -103,4 +112,4 @@ def users():
 
 
 
-run(host='localhost', port=7007)
+run(host='localhost', port=7007, debug=True)
