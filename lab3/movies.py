@@ -1,16 +1,14 @@
-<<<<<<< HEAD
 import sqlite3
 import json
 
 from bottle import get, post, run, response, request
-=======
+
 from contextlib import nullcontext
 from distutils.log import debug
 from bottle import get, post, run, request, response
 import sqlite3
 from urllib.parse import unquote
 import random
->>>>>>> 2d7a6a5f51e5aa3fbc6a4dd40fbcaf2e3ead4a20
 
 db = sqlite3.connect("movies.sqlite")
 
@@ -96,6 +94,8 @@ def reset():
 
     return "tables reset\n"
 
+# If given user name exists in db, does nothing and returns status code 400
+# Otherwise adds user nad returns the string /users/<username> and status code 201
 @post('/users')
 def users():
     c = db.cursor()
@@ -103,6 +103,8 @@ def users():
     username = request.query.username
     customer_name = request.query.fullName
     password = request.query.pwd
+
+    #
     c.execute(
         """
         
