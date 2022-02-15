@@ -139,13 +139,18 @@ def users():
 
 
 
-@post
+@post('/movies')
 def movies():
     c = db.cursor
     response.content_type = 'movies/json'
     imdbKey = request.query.imdbKey
     title = request.query.title
     year = request.query.year
+
+    if not (imdbKey, title, year):
+        response.status = 400
+        return format({"error": "Missing parameter"})
+
 
 
 run(host='localhost', port=7007, debug=True)
