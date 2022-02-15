@@ -150,6 +150,14 @@ def movies():
         response.status = 400
         return format({"error": "Missing parameter"})
 
+    c.execute(
+        """
+        SELECT 
+        
+        
+        """
+    )
+
 
 
 run(host='localhost', port=7007, debug=True)
