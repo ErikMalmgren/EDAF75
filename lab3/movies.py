@@ -16,11 +16,11 @@ def ping():
 def reset():
     c = db.cursor()
     c.execute("PRAGMA foreign_keys=OFF;")
-    c.execute("DROP TABLE IF EXITS Theaters;")
-    c.execute("DROP TABLE IF EXITS Screenings;")
-    c.execute("DROP TABLE IF EXITS Movies;")
-    c.execute("DROP TABLE IF EXITS Customers;")
-    c.execute("DROP TABLE IF EXITS Tickets;")
+    c.execute("DROP TABLE IF EXISTS Theaters;")
+    c.execute("DROP TABLE IF EXISTS Screenings;")
+    c.execute("DROP TABLE IF EXISTS Movies;")
+    c.execute("DROP TABLE IF EXISTS Customers;")
+    c.execute("DROP TABLE IF EXISTS Tickets;")
     c.execute("PRAGMA foreign_keys=ON;")
 
     c.execute(
@@ -87,7 +87,7 @@ def reset():
         """
     )
 
-    return "tables reset"
+    return "tables reset\n"
 
 @post('/users')
 def users():
