@@ -17,6 +17,15 @@ def reset():
 
     return "tables reset"
 
+@post('/users')
+def users():
+    c = db.cursor()
+    c.execute(
+        """
+        
+        
+        """
+    )
 
 
 
