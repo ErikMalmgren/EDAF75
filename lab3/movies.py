@@ -1,7 +1,7 @@
-from contextlib import nullcontext
-from bottle import get, post, run, request, response
 import sqlite3
-from urllib.parse import unquote
+import json
+
+from bottle import get, post, run, response, request
 
 db = sqlite3.connect("movies.sqlite")
 
@@ -46,7 +46,7 @@ def reset():
 
     c.execute(
         """
-        CCREATE TABLE Screenings (
+        CREATE TABLE Screenings (
         theater_name TEXT NOT NULL,
         movie        TEXT NOT NULL,
         date         DATE NOT NULL,
@@ -90,6 +90,10 @@ def reset():
 @post('/users')
 def users():
     c = db.cursor()
+    response.content_type = 'users/json'
+    username = request.query.username
+    customer_name = request.query.fullName
+    password = request.query.pwd
     c.execute(
         """
         
