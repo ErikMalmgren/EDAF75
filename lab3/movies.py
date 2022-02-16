@@ -119,10 +119,13 @@ def reset():
 def users():
     c = db.cursor()
     user = request.json
+<<<<<<< Updated upstream
     username = user['username']
     full_name = user['fullName']
     pwd = user['pwd'] # Behöver hashas
 
+=======
+>>>>>>> Stashed changes
     try:
         c.execute(
             """
