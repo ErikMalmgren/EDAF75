@@ -43,7 +43,8 @@ def reset():
         );
         """
     )
-
+    # För att undvika dubletter kan man använda UNIQUE() i sitt query (Vet inte om Isak har tänkt på detta)
+    # https://stackoverflow.com/questions/29312882/sqlite-preventing-duplicate-rows
     c.execute(
         """
         CREATE TABLE Customers (
@@ -150,12 +151,6 @@ def users():
 
 
 
-
-
-
-
-
-
 @post('/movies')
 def movies():
     c = db.cursor
@@ -163,6 +158,7 @@ def movies():
     imdbKey = request.query.imdbKey
     title = request.query.title
     year = request.query.year
+    runtime = request.query.runtime
 
     if not (imdbKey, title, year):
         response.status = 400
@@ -170,11 +166,27 @@ def movies():
 
     c.execute(
         """
-        SELECT 
-        
-        
+        INSERT
+        INTO movies(IMDB_key, title, year, runtime)
+        VALUES (?, ?, ?)
+        """,
+        [imdbKey, title, year, runtime]
+    )
+    c.execute(
+        """
+        SELECT IMDB_key
+        FROM   movies
+        WHERE  rowid = last_insert_rowid()
         """
     )
+
+    foundMovie = c.fetchone()
+    if not foundMovie:
+        return "not"
+    else:
+        db.commit()
+        return f"/users/{imdbKey}"
+
 
 
 
