@@ -173,14 +173,11 @@ def performances():
             INSERT
             INTO   screenings(theater_name, movie, date, time)
             VALUES (?, ?, ?, ?)
-            RETURNING screening_id
             """,
             [performance['theater'], performance['imdbKey'], performance['date'], performance['time']]
         )
-        db.commit()
-        screening_id = c.fetchone()
         response.status = 201
-        return f"/performances/{screening_id}"
+        return f"/performances/whack"
     except sqlite3.IntegrityError:
         response.status = 400
         return "No such movie or theater"
