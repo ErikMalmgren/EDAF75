@@ -123,10 +123,6 @@ def users():
     full_name = user['fullName']
     pwd = user['pwd'] # Behöver hashas
 
-    if not (username and full_name and pwd):
-        response.status = 400
-        return response({"error": "Missing parameter"})
-
     try:
         c.execute(
             """
