@@ -35,9 +35,9 @@ def reset():
     c.execute(
         """
         CREATE TABLE Movies (
-        IMDB_key TEXT NOT NULL,
-        title    TEXT NOT NULL,
-        year    INT NOT NULL,
+        IMDB_key TEXT,
+        title    TEXT,
+        year    INT,
         runtime  INT,
         PRIMARY KEY (IMDB_key)
         );
@@ -48,9 +48,9 @@ def reset():
     c.execute(
         """
         CREATE TABLE Customers (
-        username        TEXT NOT NULL,
-        customer_name   TEXT NOT NULL,
-        password       TEXT NOT NULL,
+        username        TEXT,
+        customer_name   TEXT,
+        password       TEXT,
         PRIMARY KEY (username)
         );
         """
@@ -59,8 +59,8 @@ def reset():
     c.execute(
         """
         CREATE TABLE Theaters (
-        theater_name        TEXT NOT NULL,
-        capacity            INT NOT NULL,
+        theater_name        TEXT,
+        capacity            INT,
         PRIMARY KEY (theater_name)
         );
         """
@@ -69,10 +69,10 @@ def reset():
     c.execute(
         """
         CREATE TABLE Screenings (
-        theater_name TEXT NOT NULL,
-        movie        TEXT NOT NULL,
-        date         DATE NOT NULL,
-        start_time   TIME NOT NULL,
+        theater_name TEXT,
+        movie        TEXT,
+        date         DATE,
+        start_time   TIME,
         screening_id TEXT DEFAULT  (lower(hex(randomblob(16))))
         PRIMARY KEY  (screening_id),
         FOREIGN KEY  (theater_name) REFERENCES Theaters(theater_name)
@@ -87,11 +87,11 @@ def reset():
         """
         CREATE TABLE Tickets(
         ticketnumber   TEXT DEFAULT (lower(hex(randomblob(16)))),
-        username       TEXT NOT NULL,
-        date           DATE NOT NULL,
-        time           TIME NOT NULL,
-        movie          TEXT NOT NULL,
-        theater_name   TEXT NOT NULL,
+        username       TEXT,
+        date           DATE,
+        time           TIME,
+        movie          TEXT,
+        theater_name   TEXT,
         PRIMARY KEY (ticketnumber),
         FOREIGN KEY (date, time, movie, theater_name)
         REFERENCES  Screenings(date, start_time, movie, theater_name)
@@ -173,7 +173,7 @@ def performances():
         c.execute(
             """
             INSERT
-            INTO   screenings(theater_name, movie, date, time)
+            INTO   screenings(theater_name, movie, date, start_time)
             VALUES (?, ?, ?, ?)
             """,
             [performance['theater'], performance['imdbKey'], performance['date'], performance['time']]
