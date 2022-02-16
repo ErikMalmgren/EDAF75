@@ -127,11 +127,11 @@ def users():
             INTO    customers(username, customer_name, password)
             VALUES  (?, ?, ?)
             """,
-            [user['username'], user['customer_name'], user['password']]
+            [user['username'], user['fullName'], user['pwd']]
                 )
         db.commit()
         response.status = 201
-        return f"/users{user['username']}"
+        return f"/users/{user['username']}"
 
     except sqlite3.IntegrityError:
         response.status = 400
