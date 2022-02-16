@@ -117,36 +117,26 @@ def reset():
 @post('/users')
 def users():
     c = db.cursor()
-    response.content_type = 'users/json'
-    username = request.query.username
-    customer_name = request.query.fullName
-    password = request.query.pwd # Behöver hashas
+    user = request.json
+    username = user['username']
+    full_name = user['fullName']
+    pwd = user['pwd'] # Behöver hashas
 
-    if not (username and customer_name and password):
+    if not (username and full_name and pwd):
         response.status = 400
         return response({"error": "Missing parameter"})
 
-    c.execute(
-      """
-      INSERT
-      INTO    customers(username, customer_name, password)
-      VALUES  (?, ?, ?)
-      """,
-        [username, customer_name, password]
-    )
-    c.execute(
-        """
-        SELECT username
-        FROM   customers
-        WHERE  rowid = last_insert_rowid()
-        """
-    )
-    foundUser = c.fetchone()
-    if not foundUser:
-        return "not"
-    else:
+    try:
+        c.execute(
+            """
+            INSERT
+            INTO    customers(username, customer_name, password)
+            VALUES  (?, ?, ?)
+            """,
+            [user['username'], user['customer_name'], user['password']]
+                )
         db.commit()
-        return f"/users/{username}"
+        response.status = 201
 
 
 
