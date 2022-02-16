@@ -31,6 +31,7 @@ def reset():
     c.execute("DROP TABLE IF EXISTS Tickets;")
     c.execute("PRAGMA foreign_keys=ON;")
 
+    # Apparently c.execute("DELETE FROM *table*") works
     c.execute(
         """
         CREATE TABLE Movies (
@@ -118,17 +119,34 @@ def users():
     response.content_type = 'users/json'
     username = request.query.username
     customer_name = request.query.fullName
-    password = request.query.pwd
+    password = request.query.pwd # Behöver hashas
 
     if not (username and customer_name and password):
         response.status = 400
         return response({"error": "Missing parameter"})
 
-    query = """
-        SELECT username, customer_name, password
+    c.execute(
+      """
+      INSERT
+      INTO    customers(username, customer_name, password)
+      VALUES  (?, ?, ?)
+      """,
+        [username, customer_name, password]
+    )
+    c.execute(
+        """
+        SELECT username
         FROM   customers
-        """,
-    params = []
+        WHERE  rowid = last_insert_rowid()
+        """
+    )
+    foundUser = c.fetchone()
+    if not foundUser:
+        return "not"
+    else:
+        db.commit()
+        return f"/users/{username}"
+
 
 
 
