@@ -18,7 +18,7 @@ def response(d):
 @get('/ping')
 def ping():
     response.status = 200
-    return "Pong\n"
+    return "pong\n"
 
 @post('/reset')
 def reset():
