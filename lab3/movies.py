@@ -138,6 +138,11 @@ def users():
                 )
         db.commit()
         response.status = 201
+        return f"/users{user['username']}"
+
+    except sqlite3.IntegrityError:
+        response.status = 400
+        return ""
 
 
 
