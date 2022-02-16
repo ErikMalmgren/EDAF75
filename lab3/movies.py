@@ -58,6 +58,16 @@ def reset():
 
     c.execute(
         """
+        CREATE TABLE Theaters (
+        theater_name        TEXT NOT NULL,
+        capacity            INT NOT NULL,
+        PRIMARY KEY (theater_name)
+        );
+        """
+    )
+
+    c.execute(
+        """
         CREATE TABLE Screenings (
         theater_name TEXT NOT NULL,
         movie        TEXT NOT NULL,
@@ -71,15 +81,7 @@ def reset():
         """
     )
 
-    c.execute(
-        """
-        CREATE TABLE Theaters (
-        theater_name        TEXT NOT NULL,
-        capacity            INT NOT NULL,
-        PRIMARY KEY (theater_name)
-        );
-        """
-    )
+    
 
     c.execute(
         """
