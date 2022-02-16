@@ -150,7 +150,7 @@ def users():
 
 
 
-
+# Kanske att vi måste plocka bort runtime, det är inte med i exemplet på JSON objekt
 @post('/movies')
 def movies():
     c = db.cursor
