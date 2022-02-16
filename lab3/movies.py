@@ -38,7 +38,7 @@ def reset():
         IMDB_key TEXT NOT NULL,
         title    TEXT NOT NULL,
         year    INT NOT NULL,
-        runtime  INT NOT NULL,
+        runtime  INT,
         PRIMARY KEY (IMDB_key)
         );
         """
@@ -152,40 +152,27 @@ def users():
 
 # Kanske att vi måste plocka bort runtime, det är inte med i exemplet på JSON objekt
 @post('/movies')
-def movies():
-    c = db.cursor
-    response.content_type = 'movies/json'
-    imdbKey = request.query.imdbKey
-    title = request.query.title
-    year = request.query.year
-    runtime = request.query.runtime
-
-    if not (imdbKey, title, year):
-        response.status = 400
-        return format({"error": "Missing parameter"})
-
-    c.execute(
-        """
-        INSERT
-        INTO movies(IMDB_key, title, year, runtime)
-        VALUES (?, ?, ?)
-        """,
-        [imdbKey, title, year, runtime]
-    )
-    c.execute(
-        """
-        SELECT IMDB_key
-        FROM   movies
-        WHERE  rowid = last_insert_rowid()
-        """
-    )
-
-    foundMovie = c.fetchone()
-    if not foundMovie:
-        return "not"
-    else:
+def movie():
+    movie = request.json 
+    c = db.cursor()
+    try:
+        c.execute(
+            """
+            INSERT
+            INTO movies(imdb_key, title, production_year)
+            VALUES (?, ?, ?)
+            """,
+            [movie['imdbKey'], movie['title'], movie['year']] 
+                )
         db.commit()
-        return f"/users/{imdbKey}"
+        response.status = 201
+        return f"/movies/{movie['imdbKey']}"
+        
+    except sqlite3.IntegrityError:
+        response.status = 400
+        return ""
+
+ 
 
 
 
