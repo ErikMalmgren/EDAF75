@@ -159,7 +159,7 @@ def movie():
         c.execute(
             """
             INSERT
-            INTO movies(imdb_key, title, production_year)
+            INTO movies(imdb_key, title, year)
             VALUES (?, ?, ?)
             """,
             [movie['imdbKey'], movie['title'], movie['year']] 
