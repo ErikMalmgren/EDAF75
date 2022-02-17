@@ -204,8 +204,7 @@ def get_performances():
         SELECT   screening_id, date, start_time, title, year, theater_name, capacity
         FROM     screenings
         JOIN     theaters
-        USING    (theater_name)    print(found)
-
+        USING    (theater_name)    
         JOIN     movies            
         USING    (imdb_key)
         """
