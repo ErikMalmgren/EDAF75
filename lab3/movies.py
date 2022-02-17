@@ -200,19 +200,25 @@ def post_performances():
 @get('/performances')
 def get_performances():
     response.content_type = 'performances/json'
-    query = """
-        SELECT   screening_id, date, start_time, title, year, theater_name, capacity
-        FROM     screenings
-        JOIN     theaters
-        USING    (theater_name)    
-        JOIN     movies            
-        USING    (imdb_key)
-        """
     c = db.cursor()
-    c.execute(query)
+    c.execute(
+        """
+        WITH ticket_count AS (
+            SELECT   screenings. screening_id, count(tickets.ticketnumber) AS count
+            FROM     screenings
+            LEFT OUTER JOIN tickets ON imdb_key = movie
+            GROUP BY  screening_id
+        ) 
+        SELECT   screening_id, date, start_time, title, year, theaters.theater_name, capacity - count
+        FROM     screenings
+        JOIN     theaters ON theaters.theater_name = screenings.theater_name
+        JOIN     movies   ON movies.imdb_key = screenings.imdb_key
+        JOIN     ticket_count USING(screening_id)
+        """
+    )
     found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year, "theater": theater_name, "remainingSeats": capacity}
         for screening_id, date, start_time, title, year, theater_name, capacity in c]
-    response.status = 201
+    response.status = 200
     return {"data": found}
 
 @get('/movies')
