@@ -70,7 +70,7 @@ def reset():
         """
         CREATE TABLE Screenings (
         theater_name TEXT,
-        movie        TEXT,
+        imdb_key     TEXT,
         date         DATE,
         start_time   TIME,
         screening_id TEXT DEFAULT  (lower(hex(randomblob(16)))),
@@ -172,7 +172,7 @@ def post_performances():
         c.execute(
             """
             INSERT
-            INTO   screenings(theater_name, movie, date, start_time)
+            INTO   screenings(theater_name, imdb_key, date, start_time)
             VALUES (?, ?, ?, ?)
             """,
             [performance['theater'], performance['imdbKey'], performance['date'], performance['time']]
@@ -199,13 +199,19 @@ def post_performances():
 def get_performances():
     c = db.cursor()
     query = """
-            SELECT   theater_name, movie, date, time, screening_id, capcity
+            SELECT   screening_id, date, start_time, imdb_key, year, theater_name, capacity
             FROM     screenings
             JOIN     theaters
             USING    (theater_name)
+            JOIN     movies
+            USING    (imdb_key)
             WHERE    1 = 1
             """
-    params = []
+    c.execute(query)
+    performances = c.fetchall()
+    print(performances)
+    return {"data:" : performances}
+
 
 
 
