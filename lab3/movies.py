@@ -111,14 +111,14 @@ def reset():
     )
     c.execute("END TRANSACTION;")
 
-    c.commit()
+    db.commit()
     response.status = 200
     return "tables reset\n"
 
 # If given username exists in db, does nothing and returns status code 400
 # Otherwise adds user nad returns the string /users/<username> and status code 201
 @post('/users')
-def users():
+def post_users():
     c = db.cursor()
     user = request.json
 
@@ -143,8 +143,8 @@ def users():
 
 # Kanske att vi måste plocka bort runtime, det är inte med i exemplet på JSON objekt
 @post('/movies')
-def movie():
-    movie = request.json 
+def post_movie():
+    movie = request.json
     c = db.cursor()
     try:
         c.execute(
@@ -165,7 +165,7 @@ def movie():
 
 
 @post('/performances')
-def performances():
+def post_performances():
     performance = request.json
     c = db.cursor()
     try:
@@ -194,6 +194,30 @@ def performances():
     except sqlite3.IntegrityError:
         response.status = 400
         return "No such movie or theater"
+
+@get('/movies')
+def get_movies():
+    c = db.cursor()
+    query = (   """
+                SELECT   imdb_key, title, year
+                FROM     movies
+                WHERE    1 = 1
+                """
+    )
+    params = []
+    if request.query.title:
+        query += " AND title = ?"
+        params.append(unquote(request.query.title))
+    if request.query.year:
+        query += " AND production_year >= ?"
+        params.append(request.query.year)
+    c = db.cursor()
+    c.execute(query, params)
+    found = [{"imdbKey": imdb_key, "title": title, "year": year}
+             for imdb_key, title, year in c]
+    response.status = 200
+    return {"data": found}
+
 
 
 
