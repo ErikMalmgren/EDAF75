@@ -1,8 +1,4 @@
-import sqlite3
 import json
-
-from bottle import get, post, run, response, request
-
 from contextlib import nullcontext
 from distutils.log import debug
 from bottle import get, post, run, request, response
@@ -201,7 +197,7 @@ def get_performances():
         WITH ticket_count AS (
             SELECT   screenings.screening_id, count(tickets.ticketnumber) AS count
             FROM     screenings
-            LEFT OUTER JOIN tickets ON imdb_key = movie
+            LEFT OUTER JOIN tickets ON imdb_
             GROUP BY  screening_id
         ) 
         SELECT   screening_id, date, start_time, title, year, theaters.theater_name, capacity - count
