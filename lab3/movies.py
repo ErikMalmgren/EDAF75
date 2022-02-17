@@ -197,12 +197,21 @@ def post_performances():
 
 @get('/movies')
 def get_movies():
+<<<<<<< Updated upstream
     c = db.cursor()
     query = """
             SELECT   imdb_key, title, year
             FROM     movies
             WHERE    1 = 1
             """
+=======
+    query = """
+        SELECT   imdb_key, title, year
+        FROM     movies
+        WHERE    1 = 1
+        """
+    
+>>>>>>> Stashed changes
     params = []
     if request.query.title:
         query += " AND title = ?"
