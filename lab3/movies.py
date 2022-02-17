@@ -194,21 +194,23 @@ def get_performances():
     c = db.cursor()
     c.execute(
         """
-        WITH ticket_count AS (
-            SELECT   screenings.screening_id, count(tickets.ticketnumber) AS count
-            FROM     screenings
-            LEFT OUTER JOIN tickets ON imdb_
+        WITH ticket_count(screening_id, ticketnumber) AS (
+            SELECT   screening_id, count() AS ticketnumber
+            FROM     tickets
             GROUP BY  screening_id
         ) 
-        SELECT   screening_id, date, start_time, title, year, theaters.theater_name, capacity - count
+        SELECT   screenings.screening_id, date, start_time, title, year, theaters.theater_name, capacity, coalesce(ticketnumber, 0) AS number_ticket
         FROM     screenings
-        JOIN     theaters ON theaters.theater_name = screenings.theater_name
-        JOIN     movies   ON movies.imdb_key = screenings.imdb_key
-        JOIN     ticket_count USING(screening_id)
+        JOIN     movies
+        USING    (imdb_key)
+        JOIN     theaters
+        USING    (theater_name)
+        LEFT OUTER JOIN ticket_count
+        USING    (screening_id)
         """
     )
-    found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year, "theater": theater_name, "remainingSeats": capacity}
-        for screening_id, date, start_time, title, year, theater_name, capacity in c]
+    found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year, "theater": theater_name, "remainingSeats": number_ticket}
+             for screening_id, date, start_time, title, year, theater_name, capacity, number_ticket in c]
     response.status = 200
     return {"data": found}
 
