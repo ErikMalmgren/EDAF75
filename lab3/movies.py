@@ -195,23 +195,30 @@ def post_performances():
         response.status = 400
         return "No such movie or theater"
 
+@get('/performances')
+def get_performances():
+    c = db.cursor()
+    query = """
+            SELECT   theater_name, movie, date, time, screening_id, capcity
+            FROM     screenings
+            JOIN     theaters
+            USING    (theater_name)
+            WHERE    1 = 1
+            """
+    params = []
+
+
+
+
+
 @get('/movies')
 def get_movies():
-<<<<<<< Updated upstream
     c = db.cursor()
     query = """
             SELECT   imdb_key, title, year
             FROM     movies
             WHERE    1 = 1
             """
-=======
-    query = """
-        SELECT   imdb_key, title, year
-        FROM     movies
-        WHERE    1 = 1
-        """
-    
->>>>>>> Stashed changes
     params = []
     if request.query.title:
         query += " AND title = ?"
