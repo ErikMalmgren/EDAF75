@@ -38,7 +38,7 @@ def reset():
     c.execute(
         """
         CREATE TABLE Movies (
-        IMDB_key TEXT,
+        imdb_key TEXT,
         title    TEXT,
         year    INT,
         runtime  INT,
@@ -77,8 +77,9 @@ def reset():
         date         DATE,
         start_time   TIME,
         screening_id TEXT DEFAULT  (lower(hex(randomblob(16)))),
-        PRIMARY KEY  (screening_id),
-        FOREIGN KEY  (theater_name) REFERENCES Theaters(theater_name)
+        FOREIGN KEY  (imdb_key) REFERENCES movies(imdb_key),
+        FOREIGN KEY  (theater_name) REFERENCES Theaters(theater_name),
+        PRIMARY KEY  (screening_id)
         );
         """
     )
@@ -90,16 +91,10 @@ def reset():
         CREATE TABLE Tickets(
         ticketnumber   TEXT DEFAULT (lower(hex(randomblob(16)))),
         username       TEXT,
-        date           DATE,
-        time           TIME,
-        movie          TEXT,
-        theater_name   TEXT,
-        screening_id   TEXT,
-        PRIMARY KEY (ticketnumber),
-        FOREIGN KEY (date, time, movie, theater_name)
-        REFERENCES  Screenings(date, start_time, movie, theater_name)
-        FOREIGN KEY (username)
-        REFERENCES  Customers(username)
+        screening_id,
+        FOREIGN KEY (screening_id) REFERENCES screenings(screening_id)
+        FOREIGN KEY (username)  REFERENCES  Customers(username),
+        PRIMARY KEY (ticketnumber)
         );
         """
     )
