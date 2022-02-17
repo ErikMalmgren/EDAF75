@@ -207,10 +207,33 @@ def get_performances():
             USING    (imdb_key)
             WHERE    1 = 1
             """
-    c.execute(query)
-    performances = c.fetchall()
-    print(performances)
-    return {"data:" : performances}
+    params = []
+    if request.query.performanceID:
+        query += " AND screening_id = ?"
+        params.append(unquote(request.query.performanceId))
+    if request.query.date:
+        query += " AND date >= ?"
+        params.append(request.query.date)
+    if request.query.startTime:
+        query += " AND start_time >= ?"
+        params.append(request.query.startTime)
+    if request.query.title:
+        query += " AND title >= ?"
+        params.append(request.query.title)
+    if request.query.year:
+        query += " AND year >= ?"
+        params.append(request.query.year)
+    if request.query.theater:
+        query += " AND theater_name >= ?"
+        params.append(request.query.theater)
+    if request.query.remainingSeats:
+        query += " AND capacity >= ?"
+        params.append(request.query.remainingSeats)
+    c.execute(query, params)
+    found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year, "theater": theater_name, "remainingSeats": capacity}
+             for screening_id, date, start_time, title, year, theater_name, capacity in c]
+    response.status = 200
+    return f"/data/{found}"
 
 
 
