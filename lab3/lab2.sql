@@ -36,9 +36,10 @@ CREATE TABLE Screenings (
     movie        TEXT NOT NULL,
     date         DATE NOT NULL,
     start_time   TIME NOT NULL,
-    PRIMARY KEY (theater_name, movie, start_time, date),
-    FOREIGN KEY (theater_name) REFERENCES Theaters(theater_name)
-  --FOREIGN KEY (movie) REFERENCES Movies(title)
+    screening_id TEXT DEFAULT  (lower(hex(randomblob(16))))
+    PRIMARY KEY (screening_id)
+    --FOREIGN KEY (theater_name) REFERENCES Theaters(theater_name)
+    --FOREIGN KEY (movie) REFERENCES Movies(title)
 );
 
 
