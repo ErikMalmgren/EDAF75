@@ -12,6 +12,9 @@ import random
 
 db = sqlite3.connect("movies.sqlite")
 
+def format_response(d):
+    return json.dumps(d, indent=4) + "\n"
+
 def response(d):
     return json.dumps(d, indent=4) + "\n"
 
@@ -188,7 +191,6 @@ def post_performances():
         )
 
         screening_id = c.fetchone()
-
         response.status = 201
         return f"/performances/{screening_id}"
     except sqlite3.IntegrityError:
@@ -197,20 +199,21 @@ def post_performances():
 
 @get('/performances')
 def get_performances():
+    response.content_type = 'performances/json'
     query = """
-        SELECT   screening_id, date, start_time, imdb_key, year, theater_name, capacity
+        SELECT   screening_id, date, start_time, title, year, theater_name, capacity
         FROM     screenings
         JOIN     theaters
-        USING    (theater_name)
+        USING    (theater_name)    print(found)
+
         JOIN     movies            
         USING    (imdb_key)
         """
     c = db.cursor()
     c.execute(query)
-    print(c)
     found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year, "theater": theater_name, "remainingSeats": capacity}
-             for screening_id, date, start_time, title, year, theater_name, capacity in c]
-    response.status = 200
+        for screening_id, date, start_time, title, year, theater_name, capacity in c]
+    response.status = 201
     return {"data": found}
 
 @get('/movies')
@@ -232,7 +235,6 @@ def get_movies():
     found = [{"imdbKey": imdb_key, "title": title, "year": year}
              for imdb_key, title, year in c]
     response.status = 200
-    print(found)
     return {"data": found}
 
 @get('/movies/<imdb_key>')
