@@ -106,7 +106,7 @@ def reset():
         INTO    theaters(theater_name, capacity)
         VALUES  ('Kino',10),
                 ('Regal', 16),
-                ('Skandia, 100);
+                ('Skandia', 100);
         """
     )
     c.execute("END TRANSACTION;")
@@ -177,8 +177,20 @@ def performances():
             """,
             [performance['theater'], performance['imdbKey'], performance['date'], performance['time']]
         )
+        db.commit()
+
+        c.execute(
+            """
+            SELECT screening_id
+            FROM   screenings
+            WHERE  rowid = last_insert_rowid()
+            """
+        )
+
+        screening_id = c.fetchone()
+
         response.status = 201
-        return f"/performances/whack"
+        return f"/performances/{screening_id}"
     except sqlite3.IntegrityError:
         response.status = 400
         return "No such movie or theater"
