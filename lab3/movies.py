@@ -198,25 +198,41 @@ def post_performances():
 @get('/movies')
 def get_movies():
     c = db.cursor()
-    query = (   """
-                SELECT   imdb_key, title, year
-                FROM     movies
-                WHERE    1 = 1
-                """
-    )
+    query = """
+            SELECT   imdb_key, title, year
+            FROM     movies
+            WHERE    1 = 1
+            """
     params = []
     if request.query.title:
         query += " AND title = ?"
         params.append(unquote(request.query.title))
     if request.query.year:
-        query += " AND production_year >= ?"
+        query += " AND year >= ?"
         params.append(request.query.year)
-    c = db.cursor()
     c.execute(query, params)
     found = [{"imdbKey": imdb_key, "title": title, "year": year}
              for imdb_key, title, year in c]
+    print(found)
     response.status = 200
     return {"data": found}
+
+@get('/movies/<imdb_key>')
+def get_movie_imdbKey(imdb_key):
+    c = db.cursor()
+    c.execute(
+          """
+          SELECT  imdb_key, title, year
+          FROM    movies
+          WHERE   imdb_key = ?
+          """,
+          [imdb_key]
+      )
+    found = [{"imdbKey":imdb_key,"title": title, "year":production_year}
+            for imdb_key, title, production_year in c]
+    response.status = 200
+    return {"data": found}
+
 
 
 
