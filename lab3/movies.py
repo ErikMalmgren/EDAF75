@@ -94,10 +94,10 @@ def reset():
         time           TIME,
         movie          TEXT,
         theater_name   TEXT,
-        screening_id   TEXT
+        screening_id   TEXT,
         PRIMARY KEY (ticketnumber),
-        FOREIGN KEY (date, time, movie, theater_name, screening_id)
-        REFERENCES  Screenings(date, start_time, movie, theater_name, screening_id)
+        FOREIGN KEY (date, time, movie, theater_name)
+        REFERENCES  Screenings(date, start_time, movie, theater_name)
         FOREIGN KEY (username)
         REFERENCES  Customers(username)
         );
@@ -204,7 +204,7 @@ def get_performances():
     c.execute(
         """
         WITH ticket_count AS (
-            SELECT   screenings. screening_id, count(tickets.ticketnumber) AS count
+            SELECT   screenings.screening_id, count(tickets.ticketnumber) AS count
             FROM     screenings
             LEFT OUTER JOIN tickets ON imdb_key = movie
             GROUP BY  screening_id
@@ -308,6 +308,44 @@ def purchase_tickets():
         response.status = 400
         return "No tickets left"
 
+@get('/tickets')
+def show_tickets():
+    c = db.cursor()
+    c.execute(
+        """
+        SELECT    ticketnumber, screening_id, username
+        FROM      tickets
+        """
+    )
+    found = [{"id": ticketnumber, "performanceId": screening_id, "username": username}
+            for ticketnumber, screening_id, username in c]
+    response.status = 200
+    return{"data": found}
+
+@get('/users/<username>/tickets')
+def get_user_tickets(username):
+    c = db.cursor()
+    c.execute(
+        """
+        WITH ticket_count AS (
+            SELECT  screenings.screening_id, count(tickets.ticketnumber) AS bought_tickets
+            FROM    screenings
+            LEFT OUTER JOIN  tickets ON tickets.screening_id = screenings.ticketnumber
+            WHERE   username = ?
+            GROUP BY  screenings.id
+        )
+        SELECT    date, time, theater_name, title, year, bought_tickets
+        FROM      screenings
+        JOIN      movies ON screenings.movie = movies.imdb_key
+        JOIN      ticket_count ON screenings.ticketnumber = ticket_count.screening_id
+        JOIN      theaters ON theaters.name = screenings.theater
+        """,
+        [username]
+    )
+    found = [{"date": date, "startTime": start_time, "theater": theater_name, "title": title, "year": year, "nbrOfTickets": bought_tickets}
+             for date, start_time, theater_name,title, year, bought_tickets in c]
+    response.status = 200
+    return{"data": found}
     
     
 
