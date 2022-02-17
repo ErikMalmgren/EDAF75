@@ -269,7 +269,7 @@ def purchase_tickets():
     if remaining_seats > 0:
         c.execute(
             """
-            SELECT    username, password
+            SELECT    username
             FROM      customers
             WHERE     username = ? and password = ?
             """,
