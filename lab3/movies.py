@@ -75,12 +75,7 @@ def reset():
         start_time   TIME,
         screening_id TEXT DEFAULT  (lower(hex(randomblob(16)))),
         PRIMARY KEY  (screening_id),
-<<<<<<< HEAD
-        FOREIGN KEY  (theater_name) REFERENCES Theaters(theater_name),
-        FOREIGN KEY  (movie) REFERENCES movies(title)
-=======
         FOREIGN KEY  (theater_name) REFERENCES Theaters(theater_name)
->>>>>>> main
         );
         """
     )
