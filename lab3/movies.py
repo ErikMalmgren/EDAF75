@@ -94,9 +94,10 @@ def reset():
         time           TIME,
         movie          TEXT,
         theater_name   TEXT,
+        screening_id   TEXT
         PRIMARY KEY (ticketnumber),
-        FOREIGN KEY (date, time, movie, theater_name)
-        REFERENCES  Screenings(date, start_time, movie, theater_name)
+        FOREIGN KEY (date, time, movie, theater_name, screening_id)
+        REFERENCES  Screenings(date, start_time, movie, theater_name, screening_id)
         FOREIGN KEY (username)
         REFERENCES  Customers(username)
         );
@@ -199,7 +200,6 @@ def post_performances():
 
 @get('/performances')
 def get_performances():
-    response.content_type = 'performances/json'
     c = db.cursor()
     c.execute(
         """
@@ -258,7 +258,58 @@ def get_movie_imdbKey(imdb_key):
     response.status = 200
     return {"data": found}
 
+@post('/tickets')
+def purchase_tickets():
+    ticket = request.json
+    c = db.cursor()
+    c.execute(
+        """
+        SELECT    capacity - count(tickets.ticketnumber) AS remaining_seats
+        FROM      screenings
+        LEFT OUTER JOIN tickets ON tickets.screening_id = screenings.screening_id
+        JOIN      theaters ON theaters.theater_name = screenings.theater_name
+        WHERE     screenings.screening_id = ?
+        """,
+        [ticket["performanceId"]]
+    )
+    remaining_seats = c.fetchone()[0]
+    if remaining_seats > 0:
+        c.execute(
+            """
+            SELECT    username, password
+            FROM      customer
+            WHERE     username = ? and password = ?
+            """,
+            [ticket["username"], ticket["pwd"]]
+        )
+        user = c.fetchone()
+        if not user:
+            response.status = 401
+            return "Wrong user credentials"
+        else:
+            try:
+                c.execute(
+                    """
+                    INSERT INTO tickets (screening_id, username)
+                    VALUES      (?, ?)
+                    RETURNING   ticketnumber
+                    """,
+                    [ticket["performanceID"], ticket["username"]]
+                )
+                found = c.fetchone()[0]
+                db.commit()
+                response.status = 201
+                id = found
+                return f"/tickets/{id}"
+            except:
+                response.status = 400
+                return "Error"
+    else:
+        response.status = 400
+        return "No tickets left"
 
+    
+    
 
 
 

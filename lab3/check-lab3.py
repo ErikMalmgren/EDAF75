@@ -111,7 +111,7 @@ def check_post_user():
         ok("POST", resource)
     except Exception as e:
         abort_on_resource("POST", resource, f"crashes ({e})")
-    
+
 
 def check_post_movie():
     resource = url("/movies")
@@ -124,7 +124,7 @@ def check_post_movie():
         ok("POST", resource)
     except Exception as e:
         abort_on_resource("POST", resource, f"crashes ({e})")
-    
+
 
 def check_post_performances():
     resource = url("/performances")
@@ -178,7 +178,7 @@ def check_get_movies_with_queries():
     for title,imdb_key,year in MOVIES:
         check_get_movies_with_query(title, year)
     check_get_movies_with_query("", 0)
-    
+
 
 def check_get_movies_with_id(imdb_key):
     resource = url(f"/movies/{imdb_key}")
