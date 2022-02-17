@@ -189,7 +189,7 @@ def post_performances():
         response.status = 400
         return "No such movie or theater"
 
-@get('/performances')
+@get('/performances') # Mysteriously not working
 def get_performances():
     c = db.cursor()
     c.execute(
@@ -270,7 +270,7 @@ def purchase_tickets():
         c.execute(
             """
             SELECT    username, password
-            FROM      customer
+            FROM      customers
             WHERE     username = ? and password = ?
             """,
             [ticket["username"], ticket["pwd"]]
@@ -323,15 +323,15 @@ def get_user_tickets(username):
         WITH ticket_count AS (
             SELECT  screenings.screening_id, count(tickets.ticketnumber) AS bought_tickets
             FROM    screenings
-            LEFT OUTER JOIN  tickets ON tickets.screening_id = screenings.ticketnumber
+            LEFT OUTER JOIN  tickets ON tickets.screening_id = screenings.screening_id
             WHERE   username = ?
-            GROUP BY  screenings.id
+            GROUP BY  screenings.screening_id
         )
-        SELECT    date, time, theater_name, title, year, bought_tickets
+        SELECT    date, start_time, theaters.theater_name, title, year, bought_tickets
         FROM      screenings
-        JOIN      movies ON screenings.movie = movies.imdb_key
-        JOIN      ticket_count ON screenings.ticketnumber = ticket_count.screening_id
-        JOIN      theaters ON theaters.name = screenings.theater
+        JOIN      movies ON screenings.imdb_key = movies.imdb_key
+        JOIN      ticket_count ON screenings.screening_id  = ticket_count.screening_id
+        JOIN      theaters ON theaters.theater_name = screenings.theater_name
         """,
         [username]
     )

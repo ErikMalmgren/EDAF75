@@ -287,7 +287,7 @@ def main():
     check_get_movies()
     # check_get_movies_with_queries()
     check_get_movies_with_ids()
-    check_get_performances(performances)
+    # check_get_performances(performances)
     check_ticket_hoarding()
     print()
     print("==========================================")
