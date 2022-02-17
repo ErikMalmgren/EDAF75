@@ -199,14 +199,14 @@ def post_performances():
 def get_performances():
     c = db.cursor()
     query = """
-            SELECT   screening_id, date, start_time, imdb_key, year, theater_name, capacity
-            FROM     screenings
-            JOIN     theaters
-            USING    (theater_name)
-            JOIN     movies
-            USING    (imdb_key)
-            WHERE    1 = 1
-            """
+        SELECT   screening_id, date, start_time, imdb_key, year, theater_name, capacity
+        FROM     screenings
+        JOIN     theaters
+        USING    (theater_name)
+        JOIN     movies            
+        USING    (imdb_key)
+        WHERE    1 = 1
+        """
     params = []
     if request.query.performanceID:
         query += " AND screening_id = ?"
@@ -232,13 +232,9 @@ def get_performances():
     c.execute(query, params)
     found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year, "theater": theater_name, "remainingSeats": capacity}
              for screening_id, date, start_time, title, year, theater_name, capacity in c]
+    print(found)
     response.status = 200
-    return f"/data/{found}"
-
-
-
-
-
+    return {"data": found}
 
 @get('/movies')
 def get_movies():
@@ -258,7 +254,6 @@ def get_movies():
     c.execute(query, params)
     found = [{"imdbKey": imdb_key, "title": title, "year": year}
              for imdb_key, title, year in c]
-    print(found)
     response.status = 200
     return {"data": found}
 
