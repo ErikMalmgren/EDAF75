@@ -197,7 +197,6 @@ def post_performances():
 
 @get('/performances')
 def get_performances():
-    c = db.cursor()
     query = """
         SELECT   screening_id, date, start_time, imdb_key, year, theater_name, capacity
         FROM     screenings
@@ -205,34 +204,12 @@ def get_performances():
         USING    (theater_name)
         JOIN     movies            
         USING    (imdb_key)
-        WHERE    1 = 1
         """
-    params = []
-    if request.query.performanceID:
-        query += " AND screening_id = ?"
-        params.append(unquote(request.query.performanceId))
-    if request.query.date:
-        query += " AND date >= ?"
-        params.append(request.query.date)
-    if request.query.startTime:
-        query += " AND start_time >= ?"
-        params.append(request.query.startTime)
-    if request.query.title:
-        query += " AND title >= ?"
-        params.append(request.query.title)
-    if request.query.year:
-        query += " AND year >= ?"
-        params.append(request.query.year)
-    if request.query.theater:
-        query += " AND theater_name >= ?"
-        params.append(request.query.theater)
-    if request.query.remainingSeats:
-        query += " AND capacity >= ?"
-        params.append(request.query.remainingSeats)
-    c.execute(query, params)
+    c = db.cursor()
+    c.execute(query)
+    print(c)
     found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year, "theater": theater_name, "remainingSeats": capacity}
              for screening_id, date, start_time, title, year, theater_name, capacity in c]
-    print(found)
     response.status = 200
     return {"data": found}
 
@@ -255,6 +232,7 @@ def get_movies():
     found = [{"imdbKey": imdb_key, "title": title, "year": year}
              for imdb_key, title, year in c]
     response.status = 200
+    print(found)
     return {"data": found}
 
 @get('/movies/<imdb_key>')
