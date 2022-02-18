@@ -273,7 +273,7 @@ def purchase_tickets():
 		""",
 		[ticket["performanceId"]]
 	)
-	remaining_seats = c.fetchone()[0]
+	remaining_seats, = c.fetchone()
 	if remaining_seats > 0:
 		c.execute(
 			"""
@@ -283,12 +283,13 @@ def purchase_tickets():
 			""",
 			[ticket["username"], hash(ticket["pwd"])]
 		)
-		user = c.fetchone()
+		user, = c.fetchone()
 		if not user:
 			response.status = 401
 			return "Wrong user credentials"
 		else:
 			try:
+				#debug: kommer hit
 				c.execute(
 					"""
 					INSERT INTO tickets (screening_id, username)
@@ -297,13 +298,14 @@ def purchase_tickets():
 					""",
 					[ticket["performanceID"], ticket["username"]]
 				)
+				# debug: kommer inte hit
 				found, = c.fetchone()
 				db.commit()
 				response.status = 201
 				id = found
 				return f"/tickets/{id}"
 			except Exception as e:
-				print(e)
+				print("exception:", e)
 				response.status = 400
 				return "Error"
 	else:
