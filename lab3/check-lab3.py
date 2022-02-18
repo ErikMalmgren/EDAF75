@@ -284,6 +284,7 @@ def main():
     check_post_user()
     check_post_movie()
     performances = check_post_performances()
+    print(performances)
     check_get_movies()
     # check_get_movies_with_queries()
     check_get_movies_with_ids()

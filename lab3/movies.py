@@ -36,74 +36,75 @@ def reset():
 	# Apparently c.execute("DELETE FROM *table*") works
 	c.execute(
 		"""
-        CREATE TABLE Movies (
-        imdb_key TEXT,
-        title    TEXT,
-        year    INT,
-        runtime  INT,
-        PRIMARY KEY (IMDB_key)
-        );
-        """
+		CREATE TABLE Movies (
+		imdb_key TEXT,
+		title    TEXT,
+		year    INT,
+		runtime  INT,
+		PRIMARY KEY (IMDB_key)
+		);
+		"""
 	)
 	# För att undvika dubletter kan man använda UNIQUE() i sitt query (Vet inte om Isak har tänkt på detta)
 	# https://stackoverflow.com/questions/29312882/sqlite-preventing-duplicate-rows
+
 	c.execute(
 		"""
-        CREATE TABLE Customers (
-        username        TEXT,
-        customer_name   TEXT,
-        password       TEXT,
-        PRIMARY KEY (username)
-        );
-        """
+		CREATE TABLE Customers (
+		username        TEXT,
+		customer_name   TEXT,
+		password       TEXT,
+		PRIMARY KEY (username)
+		);
+		"""
 	)
 
 	c.execute(
 		"""
-        CREATE TABLE Theaters (
-        theater_name        TEXT,
-        capacity            INT,
-        PRIMARY KEY (theater_name)
-        );
-        """
+		CREATE TABLE Theaters (
+		theater_name        TEXT,
+		capacity            INT,
+		PRIMARY KEY (theater_name)
+		);
+		"""
 	)
 
 	c.execute(
 		"""
-        CREATE TABLE Screenings (
-        theater_name TEXT,
-        imdb_key     TEXT,
-        date         DATE,
-        start_time   TIME,
-        screening_id TEXT DEFAULT  (lower(hex(randomblob(16)))),
-        FOREIGN KEY  (imdb_key) REFERENCES movies(imdb_key),
-        FOREIGN KEY  (theater_name) REFERENCES Theaters(theater_name),
-        PRIMARY KEY  (screening_id)
-        );
-        """
+		CREATE TABLE Screenings (
+		theater_name TEXT,
+		imdb_key     TEXT,
+		date         DATE,
+		start_time   TIME,
+		screening_id TEXT DEFAULT  (lower(hex(randomblob(16)))),
+		FOREIGN KEY  (imdb_key) REFERENCES movies(imdb_key),
+		FOREIGN KEY  (theater_name) REFERENCES Theaters(theater_name),
+		PRIMARY KEY  (screening_id)
+		);
+		"""
 	)
 
 	c.execute(
 		"""
-        CREATE TABLE Tickets(
-        ticketnumber   TEXT DEFAULT (lower(hex(randomblob(16)))),
-        username       TEXT,
-        screening_id,
-        FOREIGN KEY (screening_id) REFERENCES screenings(screening_id)
-        FOREIGN KEY (username)  REFERENCES  Customers(username),
-        PRIMARY KEY (ticketnumber)
-        );
-        """
+		CREATE TABLE Tickets(
+		ticketnumber   TEXT DEFAULT (lower(hex(randomblob(16)))),
+		username       TEXT,
+		screening_id,
+		FOREIGN KEY (screening_id) REFERENCES screenings(screening_id)
+		FOREIGN KEY (username)  REFERENCES  Customers(username),
+		PRIMARY KEY (ticketnumber)
+		);
+		"""
 	)
 	c.execute("BEGIN TRANSACTION;")
 	c.execute(
 		"""
-        INSERT
-        INTO    theaters(theater_name, capacity)
-        VALUES  ('Kino',10),
-                ('Regal', 16),
-                ('Skandia', 100);
-        """
+		INSERT
+		INTO    theaters(theater_name, capacity)
+		VALUES  ('Kino',10),
+				('Regal', 16),
+				('Skandia', 100);
+		"""
 	)
 	c.execute("END TRANSACTION;")
 
@@ -122,10 +123,10 @@ def post_users():
 	try:
 		c.execute(
 			"""
-            INSERT
-            INTO    customers(username, customer_name, password)
-            VALUES  (?, ?, ?)
-            """,
+			INSERT
+			INTO    customers(username, customer_name, password)
+			VALUES  (?, ?, ?)
+			""",
 			[user['username'], user['fullName'],hash( user['pwd'])]
 		)
 		db.commit()
@@ -145,10 +146,10 @@ def post_movie():
 	try:
 		c.execute(
 			"""
-            INSERT
-            INTO movies(imdb_key, title, year)
-            VALUES (?, ?, ?)
-            """,
+			INSERT
+			INTO movies(imdb_key, title, year)
+			VALUES (?, ?, ?)
+			""",
 			[movie['imdbKey'], movie['title'], movie['year']]
 		)
 		db.commit()
@@ -162,33 +163,33 @@ def post_movie():
 
 @post('/performances')
 def post_performances():
-    performance = request.json
-    c = db.cursor()
-    try:
-        c.execute(
-            """
-            INSERT
-            INTO   screenings(theater_name, imdb_key, date, start_time)
-            VALUES (?, ?, ?, ?)
-            """,
-            [performance['theater'], performance['imdbKey'], performance['date'], performance['time']]
-        )
-        db.commit()
+	performance = request.json
+	c = db.cursor()
+	try:
+		c.execute(
+			"""
+			INSERT
+			INTO   screenings(theater_name, imdb_key, date, start_time)
+			VALUES (?, ?, ?, ?)
+			""",
+			[performance['theater'], performance['imdbKey'], performance['date'], performance['time']]
+		)
+		db.commit()
 
-        c.execute(
-            """
-            SELECT screening_id
-            FROM   screenings
-            WHERE  rowid = last_insert_rowid()
-            """
-        )
+		c.execute(
+			"""
+			SELECT screening_id
+			FROM   screenings
+			WHERE  rowid = last_insert_rowid()
+			"""
+		)
 
-        screening_id = c.fetchone()
-        response.status = 201
-        return f"/performances/{screening_id}"
-    except sqlite3.IntegrityError:
-        response.status = 400
-        return "No such movie or theater"
+		screening_id, = c.fetchone()
+		response.status = 201
+		return f"/performances/{screening_id}"
+	except sqlite3.IntegrityError:
+		response.status = 400
+		return "No such movie or theater"
 
 
 
@@ -197,24 +198,24 @@ def get_performances():
 	c = db.cursor()
 	c.execute(
 		"""
-        WITH ticket_count(screening_id, ticketnumber) AS (
-            SELECT   screening_id, count() AS ticketnumber
-            FROM     tickets
-            GROUP BY  screening_id
-        ) 
-        SELECT   screenings.screening_id, date, start_time, title, year, theaters.theater_name, coalesce(ticketnumber, 0) AS number_ticket
-        FROM     screenings
-        JOIN     movies
-        USING    (imdb_key)
-        JOIN     theaters
-        USING    (theater_name)
-        LEFT OUTER JOIN ticket_count
-        USING    (screening_id)
-        """
+		WITH ticket_count(screening_id, ticketnumber) AS (
+			SELECT   screening_id, count() AS ticketnumber
+			FROM     tickets
+			GROUP BY  screening_id
+		) 
+		SELECT   screenings.screening_id, date, start_time, title, year, theaters.theater_name, theaters.capacity -  coalesce(ticketnumber, 0) AS number_ticket
+		FROM     screenings
+		JOIN     movies
+		USING    (imdb_key)
+		JOIN     theaters
+		USING    (theater_name)
+		LEFT OUTER JOIN ticket_count
+		USING    (screening_id)
+		"""
 	)
 	found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year,
-	          "theater": theater_name, "remainingSeats": number_ticket}
-	         for screening_id, date, start_time, title, year, theater_name, number_ticket in c]
+			  "theater": theater_name, "remainingSeats": number_ticket}
+			 for screening_id, date, start_time, title, year, theater_name, number_ticket in c]
 	response.status = 200
 	return {"data": found}
 
@@ -223,10 +224,10 @@ def get_performances():
 def get_movies():
 	c = db.cursor()
 	query = """
-            SELECT   imdb_key, title, year
-            FROM     movies
-            WHERE    1 = 1
-            """
+			SELECT   imdb_key, title, year
+			FROM     movies
+			WHERE    1 = 1
+			"""
 	params = []
 	if request.query.title:
 		query += " AND title = ?"
@@ -236,7 +237,7 @@ def get_movies():
 		params.append(request.query.year)
 	c.execute(query, params)
 	found = [{"imdbKey": imdb_key, "title": title, "year": year}
-	         for imdb_key, title, year in c]
+			 for imdb_key, title, year in c]
 	response.status = 200
 	return {"data": found}
 
@@ -253,7 +254,7 @@ def get_movie_imdbKey(imdb_key):
 		[imdb_key]
 	)
 	found = [{"imdbKey": imdb_key, "title": title, "year": production_year}
-	         for imdb_key, title, production_year in c]
+			 for imdb_key, title, production_year in c]
 	response.status = 200
 	return {"data": found}
 
@@ -264,22 +265,22 @@ def purchase_tickets():
 	c = db.cursor()
 	c.execute(
 		"""
-        SELECT    capacity - count(tickets.ticketnumber) AS remaining_seats
-        FROM      screenings
-        LEFT OUTER JOIN tickets ON tickets.screening_id = screenings.screening_id
-        JOIN      theaters ON theaters.theater_name = screenings.theater_name
-        WHERE     screenings.screening_id = ?
-        """,
+		SELECT    capacity - count(tickets.ticketnumber) AS remaining_seats
+		FROM      screenings
+		LEFT OUTER JOIN tickets ON tickets.screening_id = screenings.screening_id
+		JOIN      theaters ON theaters.theater_name = screenings.theater_name
+		WHERE     screenings.screening_id = ?
+		""",
 		[ticket["performanceId"]]
 	)
 	remaining_seats = c.fetchone()[0]
 	if remaining_seats > 0:
 		c.execute(
 			"""
-            SELECT    username
-            FROM      customers
-            WHERE     username = ? and password = ?
-            """,
+			SELECT    username
+			FROM      customers
+			WHERE     username = ? and password = ?
+			""",
 			[ticket["username"], hash(ticket["pwd"])]
 		)
 		user = c.fetchone()
@@ -290,18 +291,19 @@ def purchase_tickets():
 			try:
 				c.execute(
 					"""
-                    INSERT INTO tickets (screening_id, username)
-                    VALUES      (?, ?)
-                    RETURNING   ticketnumber
-                    """,
+					INSERT INTO tickets (screening_id, username)
+					VALUES      (?, ?)
+					RETURNING   ticketnumber
+					""",
 					[ticket["performanceID"], ticket["username"]]
 				)
-				found = c.fetchone()[0]
+				found, = c.fetchone()
 				db.commit()
 				response.status = 201
 				id = found
 				return f"/tickets/{id}"
-			except:
+			except Exception as e:
+				print(e)
 				response.status = 400
 				return "Error"
 	else:
@@ -314,12 +316,12 @@ def show_tickets():
 	c = db.cursor()
 	c.execute(
 		"""
-        SELECT    ticketnumber, screening_id, username
-        FROM      tickets
-        """
+		SELECT    ticketnumber, screening_id, username
+		FROM      tickets
+		"""
 	)
 	found = [{"id": ticketnumber, "performanceId": screening_id, "username": username}
-	         for ticketnumber, screening_id, username in c]
+			 for ticketnumber, screening_id, username in c]
 	response.status = 200
 	return {"data": found}
 
@@ -329,24 +331,24 @@ def get_user_tickets(username):
 	c = db.cursor()
 	c.execute(
 		"""
-        WITH ticket_count AS (
-            SELECT  screenings.screening_id, count(tickets.ticketnumber) AS bought_tickets
-            FROM    screenings
-            LEFT OUTER JOIN  tickets ON tickets.screening_id = screenings.screening_id
-            WHERE   username = ?
-            GROUP BY  screenings.screening_id
-        )
-        SELECT    date, start_time, theaters.theater_name, title, year, bought_tickets
-        FROM      screenings
-        JOIN      movies ON screenings.imdb_key = movies.imdb_key
-        JOIN      ticket_count ON screenings.screening_id  = ticket_count.screening_id
-        JOIN      theaters ON theaters.theater_name = screenings.theater_name
-        """,
+		WITH ticket_count AS (
+			SELECT  screenings.screening_id, count(tickets.ticketnumber) AS bought_tickets
+			FROM    screenings
+			LEFT OUTER JOIN  tickets ON tickets.screening_id = screenings.screening_id
+			WHERE   username = ?
+			GROUP BY  screenings.screening_id
+		)
+		SELECT    date, start_time, theaters.theater_name, title, year, bought_tickets
+		FROM      screenings
+		JOIN      movies ON screenings.imdb_key = movies.imdb_key
+		JOIN      ticket_count ON screenings.screening_id  = ticket_count.screening_id
+		JOIN      theaters ON theaters.theater_name = screenings.theater_name
+		""",
 		[username]
 	)
 	found = [{"date": date, "startTime": start_time, "theater": theater_name, "title": title, "year": year,
-	          "nbrOfTickets": bought_tickets}
-	         for date, start_time, theater_name, title, year, bought_tickets in c]
+			  "nbrOfTickets": bought_tickets}
+			 for date, start_time, theater_name, title, year, bought_tickets in c]
 	response.status = 200
 	return {"data": found}
 
