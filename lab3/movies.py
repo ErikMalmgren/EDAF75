@@ -1,10 +1,9 @@
 import json
-from contextlib import nullcontext
-from distutils.log import debug
+
 from bottle import get, post, run, request, response
 import sqlite3
 from urllib.parse import unquote
-import random
+
 
 db = sqlite3.connect("movies.sqlite")
 
@@ -12,9 +11,9 @@ db = sqlite3.connect("movies.sqlite")
 def format_response(d):
 	return json.dumps(d, indent=4) + "\n"
 
-
-def response(d):
-	return json.dumps(d, indent=4) + "\n"
+def hash(password):
+	import hashlib
+	return hashlib.sha256(password.encode('utf-8')).hexdigest()
 
 
 @get('/ping')
@@ -127,7 +126,7 @@ def post_users():
             INTO    customers(username, customer_name, password)
             VALUES  (?, ?, ?)
             """,
-			[user['username'], user['fullName'], user['pwd']]
+			[user['username'], user['fullName'],hash( user['pwd'])]
 		)
 		db.commit()
 		response.status = 201
@@ -203,7 +202,7 @@ def get_performances():
             FROM     tickets
             GROUP BY  screening_id
         ) 
-        SELECT   screenings.screening_id, date, start_time, title, year, theaters.theater_name, capacity, coalesce(ticketnumber, 0) AS number_ticket
+        SELECT   screenings.screening_id, date, start_time, title, year, theaters.theater_name, coalesce(ticketnumber, 0) AS number_ticket
         FROM     screenings
         JOIN     movies
         USING    (imdb_key)
@@ -215,7 +214,7 @@ def get_performances():
 	)
 	found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year,
 	          "theater": theater_name, "remainingSeats": number_ticket}
-	         for screening_id, date, start_time, title, year, theater_name, capacity, number_ticket in c]
+	         for screening_id, date, start_time, title, year, theater_name, number_ticket in c]
 	response.status = 200
 	return {"data": found}
 
@@ -281,7 +280,7 @@ def purchase_tickets():
             FROM      customers
             WHERE     username = ? and password = ?
             """,
-			[ticket["username"], ticket["pwd"]]
+			[ticket["username"], hash(ticket["pwd"])]
 		)
 		user = c.fetchone()
 		if not user:
