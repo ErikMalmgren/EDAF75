@@ -4,12 +4,12 @@ from bottle import get, post, run, request, response
 import sqlite3
 from urllib.parse import unquote
 
-
 db = sqlite3.connect("movies.sqlite")
 
 
 def format_response(d):
 	return json.dumps(d, indent=4) + "\n"
+
 
 def hash(password):
 	import hashlib
@@ -39,7 +39,7 @@ def reset():
 		CREATE TABLE Movies (
 		imdb_key TEXT,
 		title    TEXT,
-		year    INT,
+		year     INT,
 		runtime  INT,
 		PRIMARY KEY (IMDB_key)
 		);
@@ -51,8 +51,8 @@ def reset():
 	c.execute(
 		"""
 		CREATE TABLE Customers (
-		username        TEXT,
-		customer_name   TEXT,
+		username       TEXT,
+		customer_name  TEXT,
 		password       TEXT,
 		PRIMARY KEY (username)
 		);
@@ -77,7 +77,7 @@ def reset():
 		date         DATE,
 		start_time   TIME,
 		screening_id TEXT DEFAULT  (lower(hex(randomblob(16)))),
-		FOREIGN KEY  (imdb_key) REFERENCES movies(imdb_key),
+		FOREIGN KEY  (imdb_key)     REFERENCES movies(imdb_key),
 		FOREIGN KEY  (theater_name) REFERENCES Theaters(theater_name),
 		PRIMARY KEY  (screening_id)
 		);
@@ -91,7 +91,7 @@ def reset():
 		username       TEXT,
 		screening_id,
 		FOREIGN KEY (screening_id) REFERENCES screenings(screening_id)
-		FOREIGN KEY (username)  REFERENCES  Customers(username),
+		FOREIGN KEY (username)     REFERENCES customers(username),
 		PRIMARY KEY (ticketnumber)
 		);
 		"""
@@ -127,7 +127,7 @@ def post_users():
 			INTO    customers(username, customer_name, password)
 			VALUES  (?, ?, ?)
 			""",
-			[user['username'], user['fullName'],hash( user['pwd'])]
+			[user['username'], user['fullName'], hash(user['pwd'])]
 		)
 		db.commit()
 		response.status = 201
@@ -192,7 +192,6 @@ def post_performances():
 		return "No such movie or theater"
 
 
-
 @get('/performances')  # Mysteriously not working
 def get_performances():
 	c = db.cursor()
@@ -203,7 +202,8 @@ def get_performances():
 			FROM     tickets
 			GROUP BY  screening_id
 		) 
-		SELECT   screenings.screening_id, date, start_time, title, year, theaters.theater_name, theaters.capacity -  coalesce(ticketnumber, 0) AS number_ticket
+		SELECT   screenings.screening_id, date, start_time, title, year, theaters.theater_name, 
+		theaters.capacity -  coalesce(ticketnumber, 0) AS number_ticket
 		FROM     screenings
 		JOIN     movies
 		USING    (imdb_key)
@@ -214,8 +214,8 @@ def get_performances():
 		"""
 	)
 	found = [{"performanceId": screening_id, "date": date, "startTime": start_time, "title": title, "year": year,
-			  "theater": theater_name, "remainingSeats": number_ticket}
-			 for screening_id, date, start_time, title, year, theater_name, number_ticket in c]
+	          "theater": theater_name, "remainingSeats": number_ticket}
+	         for screening_id, date, start_time, title, year, theater_name, number_ticket in c]
 	response.status = 200
 	return {"data": found}
 
@@ -237,7 +237,7 @@ def get_movies():
 		params.append(request.query.year)
 	c.execute(query, params)
 	found = [{"imdbKey": imdb_key, "title": title, "year": year}
-			 for imdb_key, title, year in c]
+			for imdb_key, title, year in c]
 	response.status = 200
 	return {"data": found}
 
@@ -254,7 +254,7 @@ def get_movie_imdbKey(imdb_key):
 		[imdb_key]
 	)
 	found = [{"imdbKey": imdb_key, "title": title, "year": production_year}
-			 for imdb_key, title, production_year in c]
+	         for imdb_key, title, production_year in c]
 	response.status = 200
 	return {"data": found}
 
@@ -289,14 +289,14 @@ def purchase_tickets():
 			return "Wrong user credentials"
 		else:
 			try:
-				#debug: kommer hit
+				# debug: kommer hit
 				c.execute(
 					"""
 					INSERT INTO tickets (screening_id, username)
 					VALUES      (?, ?)
 					RETURNING   ticketnumber
 					""",
-					[ticket["performanceID"], ticket["username"]]
+					[ticket["performanceId"], ticket["username"]]
 				)
 				# debug: kommer inte hit
 				found, = c.fetchone()
@@ -304,7 +304,7 @@ def purchase_tickets():
 				response.status = 201
 				id = found
 				return f"/tickets/{id}"
-			except Exception as e:
+			except sqlite3.IntegrityError as e:
 				print("exception:", e)
 				response.status = 400
 				return "Error"
@@ -323,7 +323,7 @@ def show_tickets():
 		"""
 	)
 	found = [{"id": ticketnumber, "performanceId": screening_id, "username": username}
-			 for ticketnumber, screening_id, username in c]
+	         for ticketnumber, screening_id, username in c]
 	response.status = 200
 	return {"data": found}
 
@@ -349,8 +349,8 @@ def get_user_tickets(username):
 		[username]
 	)
 	found = [{"date": date, "startTime": start_time, "theater": theater_name, "title": title, "year": year,
-			  "nbrOfTickets": bought_tickets}
-			 for date, start_time, theater_name, title, year, bought_tickets in c]
+	          "nbrOfTickets": bought_tickets}
+	         for date, start_time, theater_name, title, year, bought_tickets in c]
 	response.status = 200
 	return {"data": found}
 
