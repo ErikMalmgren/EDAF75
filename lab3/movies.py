@@ -1,15 +1,8 @@
-import json
-
 from bottle import get, post, run, request, response
 import sqlite3
 from urllib.parse import unquote
 
 db = sqlite3.connect("movies.sqlite")
-
-
-def format_response(d):
-	return json.dumps(d, indent=4) + "\n"
-
 
 def hash(password):
 	import hashlib
@@ -192,7 +185,7 @@ def post_performances():
 		return "No such movie or theater"
 
 
-@get('/performances')  # Mysteriously not working
+@get('/performances')  # Now working as intended!
 def get_performances():
 	c = db.cursor()
 	c.execute(
@@ -237,7 +230,7 @@ def get_movies():
 		params.append(request.query.year)
 	c.execute(query, params)
 	found = [{"imdbKey": imdb_key, "title": title, "year": year}
-			for imdb_key, title, year in c]
+	         for imdb_key, title, year in c]
 	response.status = 200
 	return {"data": found}
 
@@ -289,7 +282,6 @@ def purchase_tickets():
 			return "Wrong user credentials"
 		else:
 			try:
-				# debug: kommer hit
 				c.execute(
 					"""
 					INSERT INTO tickets (screening_id, username)
@@ -298,14 +290,12 @@ def purchase_tickets():
 					""",
 					[ticket["performanceId"], ticket["username"]]
 				)
-				# debug: kommer inte hit
 				found, = c.fetchone()
 				db.commit()
 				response.status = 201
-				id = found
-				return f"/tickets/{id}"
-			except sqlite3.IntegrityError as e:
-				print("exception:", e)
+				return f"/tickets/{found}"
+			except Exception as e:
+				print(e)
 				response.status = 400
 				return "Error"
 	else:
